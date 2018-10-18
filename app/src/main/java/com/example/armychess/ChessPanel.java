@@ -31,6 +31,7 @@ public class ChessPanel extends View  {
     private boolean Who=true;//判断谁先手，谁创建对局谁先手
     private boolean IsFirst=true;//判断落子的顺序，点击棋子，再次点击要落的区域
     private boolean isFirstImport=true;//这里是指第一次连接后，要将布局发送给对方。
+    private static boolean you=false;
     private String address="a";
     private BluetoothSPP st;
     private chess FirstChess;//记录第一次点击的位置
@@ -493,16 +494,91 @@ public class ChessPanel extends View  {
         invalidate();
         return true;
     }
+    //迷宫算法
+    private static boolean solved(int [][]a,int begin,int end,int targetX,int targetY)
+    {
+        if (you)
+        {
+            return true;
+        }
+        if (begin==targetX&&end==targetY)
+
+        {
+            you=true;
+            return true;
+        }
+        a[begin][end]=2;
+        if (a[begin+1][end]==0)
+        {
+            solved(a,begin+1,end,targetX,targetY);
+        }
+
+        if (a[begin][end+1]==0)
+        {
+            solved(a,begin,end+1,targetX,targetY);
+        }
+        if (a[begin ][end-1]==0)
+        {
+            solved(a,begin,end-1,targetX,targetY);
+        }
+        if (a[begin-1][end]==0)
+        {
+            solved(a,begin-1,end,targetX,targetY);
+        }
+        return false;
+    }
     private boolean JudgeRuler(chess begin,chess end)
     {
         //工兵算法
         if (mine.get(mine.indexOf(begin)).getWeight()==1)
         {
+            if ( (begin.getX()>0&&begin.getX()<13&&(begin.getY()==0||begin.getY()==4) )||begin.getX()==5||begin.getX()==8 )
+            {
+                if ( (end.getX()>0&&end.getX()<13&&(end.getY()==0||end.getY()==4) )||end.getX()==5||end.getX()==8 )
+                {
+                    if (mine.get(mine.indexOf(begin)).getWeight()==1)
+                    {
+                        int [][]road={
+                                {1,1,1,1,1,1,1},
+                                {1,0,0,0,0,0,1},
+                                {1,0,1,1,1,0,1},
+                                {1,0,1,1,1,0,1},
+                                {1,0,1,1,1,0,1},
+                                {1,0,0,0,0,0,1},
+                                {1,0,1,0,1,0,1},
+                                {1,0,1,0,1,0,1},
+                                {1,0,0,0,0,0,1},
+                                {1,0,1,1,1,0,1},
+                                {1,0,1,1,1,0,1},
+                                {1,0,1,1,1,0,1},
+                                {1,0,0,0,0,0,1},
+                                {1,1,1,1,1,1,1},
+                        };
+                        for (int i=0;i<mine.size();i++)
+                        {
+                            int x=mine.get(i).getX();
+                            int y=mine.get(i).getY()+1;
+                            road[x][y]=2;
+                        }
+                        for (int i=0;i<enemy.size();i++)
+                        {
+                            int x=enemy.get(i).getX();
+                            int y=enemy.get(i).getY()+1;
+                            road[x][y]=2;
+                        }
+                        you=false;
 
+                        solved(road,begin.getX(),begin.getY()+1,end.getX(),end.getY()+1);
+                        if(you){
+                            return true;
+                        }else
+                            return false;
+                    }
+                }
 
-
-
+            }
         }
+
         //考虑普通路线，如果相差的只有一个格子，那么就可以到达。
         if (Math.abs(begin.getY()-end.getY()+begin.getX()-end.getX())==1)
         {
