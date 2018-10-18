@@ -131,7 +131,8 @@ public class ChessPanel extends View  {
                     wei = Integer.parseInt(d);
                     delete=Integer.parseInt(a);
                     enemy.remove(delete);
-                    enemy.add(new chess(13 - pointx, 4 - pointy, -1 * wei));
+                    if (wei<19)
+                         enemy.add(new chess(13 - pointx, 4 - pointy, -1 * wei));
                     if (mine.contains(new chess(13 - pointx, 4 - pointy )))
                     {
                         mine.remove(mine.indexOf(new chess(13 - pointx, 4 - pointy ) ));
@@ -444,8 +445,54 @@ public class ChessPanel extends View  {
             {
                 if(JudgeRuler(FirstChess,SecondPosition))
                 {
+                    //看我方是不是工兵，那么就吃掉地雷
+                    if (mine.get(mine.indexOf(FirstChess)).getWeight()==1)
+                {
+                    if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()== -11)//工兵干掉地雷
+                    {
+                        int index=mine.indexOf(FirstChess);
+                        int weight = mine.get(index).getWeight();
+                        int indexOfenemy=enemy.indexOf(SecondPosition);
+                        enemy.remove(indexOfenemy);
+                        IsFirst=!IsFirst;
+                        mine.remove(index);
+                        mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
+                        String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
+                        st.send(mess,true);
+                        Who=!Who;
+                    }
+                    else if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()==12)//拔旗
+                    {
+                        for (int i=0;i<enemy.size();i++)
+                        {
+                            if (enemy.get(i).getWeight()==11)
+                            {
+                                return false;
+                            }
+                        }
+                        int index=mine.indexOf(FirstChess);
+                        int weight = mine.get(index).getWeight();
+                        int indexOfenemy=enemy.indexOf(SecondPosition);
+                        enemy.remove(indexOfenemy);
+                        IsFirst=!IsFirst;
+                        mine.remove(index);
+                        mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
+                        String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
+                        st.send(mess,true);
+                        Who=!Who;
+                        //游戏结束
+                    }
+                }
+                //炸弹的同归于尽
+                if (mine.get(mine.indexOf(FirstChess)).getWeight() == 10 || enemy.get(enemy.indexOf(SecondPosition)).getWeight() == -10 )
+                {
+                    BothDie(FirstChess,SecondPosition);
+                    Who=!Who;
+                    return true;
+                }
                     //既然可以到达，那么比较权重。
                     //行营的棋子不可以吃
+
                     if (xingying.contains(SecondPosition))
                     {
                         Toast.makeText(getContext(),"行营的棋子不可以吃",Toast.LENGTH_SHORT).show();
@@ -461,6 +508,7 @@ public class ChessPanel extends View  {
                         IsFirst=!IsFirst;
                         mine.remove(index);
                         mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
+                        //发送 本方的index，本方将要移动的坐标和本方的权重
                         String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
                         st.send(mess,true);
                         Who=!Who;
@@ -494,6 +542,20 @@ public class ChessPanel extends View  {
         invalidate();
         return true;
     }
+
+    //同归于尽算法
+    private  void BothDie(chess begin,chess end)
+    {
+        int wofang=0;
+        int difang=0;
+        wofang=mine.indexOf(begin);
+        difang=enemy.indexOf(end);
+        mine.remove(mine.indexOf(begin));
+        enemy.remove(enemy.indexOf(end));
+        st.send(""+wofang+","+end.getX()+","+end.getY()+","+"20",true);
+
+    }
+
     //迷宫算法
     private static boolean solved(int [][]a,int begin,int end,int targetX,int targetY)
     {
