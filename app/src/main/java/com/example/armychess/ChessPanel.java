@@ -443,53 +443,60 @@ public class ChessPanel extends View  {
             }
             else if (enemy.contains(SecondPosition))//那个位置有敌人的棋子
             {
+                Log.d(TAG, "onTouchEent: 敌人的棋子"+enemy.get(enemy.indexOf(SecondPosition)).getWeight());
+                Log.d(TAG, "onTouchEvent: 我方棋子"+mine.get(mine.indexOf(FirstChess)).getWeight());
                 if(JudgeRuler(FirstChess,SecondPosition))
                 {
-                    //看我方是不是工兵，那么就吃掉地雷
-                    if (mine.get(mine.indexOf(FirstChess)).getWeight()==1)
-                {
-                    if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()== -11)//工兵干掉地雷
-                    {
-                        int index=mine.indexOf(FirstChess);
-                        int weight = mine.get(index).getWeight();
-                        int indexOfenemy=enemy.indexOf(SecondPosition);
-                        enemy.remove(indexOfenemy);
-                        IsFirst=!IsFirst;
-                        mine.remove(index);
-                        mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
-                        String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
-                        st.send(mess,true);
-                        Who=!Who;
-                    }
-                    else if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()==12)//拔旗
-                    {
-                        for (int i=0;i<enemy.size();i++)
-                        {
-                            if (enemy.get(i).getWeight()==11)
-                            {
-                                return false;
-                            }
-                        }
-                        int index=mine.indexOf(FirstChess);
-                        int weight = mine.get(index).getWeight();
-                        int indexOfenemy=enemy.indexOf(SecondPosition);
-                        enemy.remove(indexOfenemy);
-                        IsFirst=!IsFirst;
-                        mine.remove(index);
-                        mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
-                        String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
-                        st.send(mess,true);
-                        Who=!Who;
-                        //游戏结束
-                    }
-                }
-                //炸弹的同归于尽
+                    //炸弹的同归于尽
                 if (mine.get(mine.indexOf(FirstChess)).getWeight() == 10 || enemy.get(enemy.indexOf(SecondPosition)).getWeight() == -10 )
                 {
+                    Log.d(TAG, "onTouchEvent: 同归于尽");
                     BothDie(FirstChess,SecondPosition);
-                    Who=!Who;
                     return true;
                 }
+
+                    //看我方是不是工兵，那么就吃掉地雷，军旗
+                    if (mine.get(mine.indexOf(FirstChess)).getWeight()==1)
+                    {
+                        Log.d(TAG, "onTouchEvent: 我方工兵");
+                        if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()== -11)//工兵干掉地雷
+                        {
+                            int index=mine.indexOf(FirstChess);
+                            int weight = mine.get(index).getWeight();
+                            int indexOfenemy=enemy.indexOf(SecondPosition);
+                            enemy.remove(indexOfenemy);
+                            IsFirst=!IsFirst;
+                            mine.remove(index);
+                            mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
+                            String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
+                            st.send(mess,true);
+                            Who=!Who;
+                            return true;
+                        }
+                        else if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()==-12)//拔旗
+                        {
+                            for (int i=0;i<enemy.size();i++)
+                            {
+                                if (enemy.get(i).getWeight()==-11)
+                                {
+                                    return false;
+                                }
+                            }
+                            int index=mine.indexOf(FirstChess);
+                            int weight = mine.get(index).getWeight();
+                            int indexOfenemy=enemy.indexOf(SecondPosition);
+                            enemy.remove(indexOfenemy);
+                            IsFirst=!IsFirst;
+                            mine.remove(index);
+                            mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
+                            String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
+                            st.send(mess,true);
+                            Who=!Who;
+                            return true;
+                            //游戏结束
+                        }
+                        Log.d(TAG, "onTouchEvent: 不是地雷和军旗");
+                    }
                     //既然可以到达，那么比较权重。
                     //行营的棋子不可以吃
 
@@ -525,7 +532,6 @@ public class ChessPanel extends View  {
                {
                    IsFirst=!IsFirst;
                    int index=mine.indexOf(FirstChess);
-                   Log.d(TAG, "onTouchEvent: "+index);
                    int  weight=mine.get(index).getWeight();
                    mine.remove(index);
                    mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
@@ -552,7 +558,9 @@ public class ChessPanel extends View  {
         difang=enemy.indexOf(end);
         mine.remove(mine.indexOf(begin));
         enemy.remove(enemy.indexOf(end));
+        //这里的weight为20，目的是为了接收数据时，筛选出去。
         st.send(""+wofang+","+end.getX()+","+end.getY()+","+"20",true);
+        Who=!Who;
 
     }
 
@@ -628,6 +636,7 @@ public class ChessPanel extends View  {
                             int y=enemy.get(i).getY()+1;
                             road[x][y]=2;
                         }
+                        road[end.getX()][end.getY()+1]=0;//工兵要达到的地方。
                         you=false;
 
                         solved(road,begin.getX(),begin.getY()+1,end.getX(),end.getY()+1);

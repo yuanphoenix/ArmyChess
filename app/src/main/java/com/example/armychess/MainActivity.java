@@ -113,10 +113,10 @@ public class MainActivity extends AppCompatActivity{
 
     void createdatabses() {
         base.add("8,0,1");
-        base.add("8,1,1");
+        base.add("8,1,11");
         base.add("8,2,1");
-        base.add("8,3,2");
-        base.add("8,4,2");
+        base.add("8,3,10");
+        base.add("8,4,10");
 
         base.add("9,0,2");
         base.add("9,2,3");
@@ -135,12 +135,12 @@ public class MainActivity extends AppCompatActivity{
         base.add("12,1,7");
         base.add("12,2,8");
         base.add("12,3,9");
-        base.add("12,4,10");
+        base.add("12,4,2");
 
-        base.add("13,0,10");
+        base.add("13,0,1");
         base.add("13,1,11");
         base.add("13,2,11");
-        base.add("13,3,11");
+        base.add("13,3,2");
         base.add("13,4,12");
     }
 
