@@ -18,12 +18,23 @@
         android:id="@+id/anwei"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     <Button
-        android:text="加入游戏"
         android:id="@+id/Joingame"
         android:layout_width="200dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/Creategame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:gravity="center"
+        android:text="加入游戏" />
+    <Button
+        android:id="@+id/Createbuju"
+        android:text="自定义布局"
+        android:layout_width="200dp"
+        android:layout_below="@id/Joingame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:layout_height="wrap_content" />
 
 </RelativeLayout>

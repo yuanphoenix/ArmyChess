@@ -19,6 +19,10 @@ public class chess extends Point {
         this.weight=z;
     }
 
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
     public void setX(int x)
     {
         this.x=x;

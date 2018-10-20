@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.text.method.MovementMethod;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -28,6 +29,7 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 public class ChessPanel extends View  {
     private String TAG="棋子";
+    private boolean isGameOver=false;
     private boolean Who=true;//判断谁先手，谁创建对局谁先手
     private boolean IsFirst=true;//判断落子的顺序，点击棋子，再次点击要落的区域
     private boolean isFirstImport=true;//这里是指第一次连接后，要将布局发送给对方。
@@ -40,6 +42,7 @@ public class ChessPanel extends View  {
     private float mLineWidth;
     private int mPanelLength;
     private int MAX_LINE=14;
+    private int Ch=-1;
     private float ratioPieceOfLineHeight=3*1.0f/4;
     float ratioOfCilcle=1*1.0f/2;//为了画圆圈而定制的比例
     private Paint mPaint = new Paint();
@@ -150,8 +153,7 @@ public class ChessPanel extends View  {
             public void onDeviceConnected(String name, String address) {
                 if (isFirstImport)
                 {
-                    loadchess();
-                    invalidate();
+                    new aab().execute();
                     isFirstImport=false;
                 }
             }
@@ -209,17 +211,15 @@ public class ChessPanel extends View  {
         xingying.add(new chess(11,3));
     }
 
-    private void loadchess()//该方法实现了对本方布阵棋子的加载。
+    private void loadchess(int j)//该方法实现了对本方布阵棋子的加载。
     {
         mine.clear();
         List<distribution> buju=DataSupport.findAll(distribution.class);
         List<String> temp=new ArrayList<>();
-        int j=0;
-        for (distribution db :buju)
-        {
-            if (j==0)
-                temp=db.getStore();
-        }
+
+        List<distribution> dist=DataSupport.limit(1).offset(j).find(distribution.class);
+        distribution db=dist.get(0);
+        temp= db.getStore();
         for (int i=0;i<temp.size();i++)
         {
             String gui=temp.get(i);//用于从temp中取出一个数据
@@ -248,6 +248,7 @@ public class ChessPanel extends View  {
             wei=Integer.parseInt(c);
             mine.add(new chess(pointx,pointy,wei));
         }
+        invalidate();
     }
 
     @Override
@@ -404,6 +405,12 @@ public class ChessPanel extends View  {
     public boolean onTouchEvent(MotionEvent event) {
         if (!Who)
         {
+            Toast.makeText(getContext(),"现在是对方在下",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (isGameOver)
+        {
+            Toast.makeText(getContext(),"游戏已经结束",Toast.LENGTH_SHORT).show();
             return false;
         }
         int action=event.getAction();
@@ -417,7 +424,9 @@ public class ChessPanel extends View  {
                 if (mine.contains(FirstChess))
                 {
                     if (mine.get(mine.indexOf(FirstChess)).getWeight()<11)
-                    {IsFirst=!IsFirst;}
+                    {
+                        IsFirst=!IsFirst;
+                    }
                     else
                     {
                         Toast.makeText(getContext(),"地雷军旗不可移动" ,Toast.LENGTH_SHORT).show();
@@ -443,22 +452,24 @@ public class ChessPanel extends View  {
             }
             else if (enemy.contains(SecondPosition))//那个位置有敌人的棋子
             {
-                Log.d(TAG, "onTouchEent: 敌人的棋子"+enemy.get(enemy.indexOf(SecondPosition)).getWeight());
-                Log.d(TAG, "onTouchEvent: 我方棋子"+mine.get(mine.indexOf(FirstChess)).getWeight());
                 if(JudgeRuler(FirstChess,SecondPosition))
                 {
+                    //行营的棋子不可以吃,这个的优先级最高。
+                    if (xingying.contains(SecondPosition))
+                    {
+                        Toast.makeText(getContext(),"行营的棋子不可以吃",Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
                     //炸弹的同归于尽
-                if (mine.get(mine.indexOf(FirstChess)).getWeight() == 10 || enemy.get(enemy.indexOf(SecondPosition)).getWeight() == -10 )
-                {
-                    Log.d(TAG, "onTouchEvent: 同归于尽");
-                    BothDie(FirstChess,SecondPosition);
-                    return true;
-                }
-
+                    if (mine.get(mine.indexOf(FirstChess)).getWeight() == 10 || enemy.get(enemy.indexOf(SecondPosition)).getWeight() == -10 )
+                    {
+                        BothDie(FirstChess,SecondPosition);
+                        invalidate();
+                        return true;
+                    }
                     //看我方是不是工兵，那么就吃掉地雷，军旗
                     if (mine.get(mine.indexOf(FirstChess)).getWeight()==1)
                     {
-                        Log.d(TAG, "onTouchEvent: 我方工兵");
                         if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()== -11)//工兵干掉地雷
                         {
                             int index=mine.indexOf(FirstChess);
@@ -471,7 +482,6 @@ public class ChessPanel extends View  {
                             String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
                             st.send(mess,true);
                             Who=!Who;
-                            return true;
                         }
                         else if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()==-12)//拔旗
                         {
@@ -492,19 +502,14 @@ public class ChessPanel extends View  {
                             String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
                             st.send(mess,true);
                             Who=!Who;
-                            return true;
                             //游戏结束
+                            isGameOver=true;
+
                         }
                         Log.d(TAG, "onTouchEvent: 不是地雷和军旗");
                     }
-                    //既然可以到达，那么比较权重。
-                    //行营的棋子不可以吃
+                    //普通的吃子。既然可以到达，那么比较权重。
 
-                    if (xingying.contains(SecondPosition))
-                    {
-                        Toast.makeText(getContext(),"行营的棋子不可以吃",Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
                     int index=mine.indexOf(FirstChess);
                     int weight = mine.get(index).getWeight();
                     int indexOfenemy=enemy.indexOf(SecondPosition);
@@ -522,7 +527,7 @@ public class ChessPanel extends View  {
                     }else
                     {
                         Toast.makeText(getContext(),"你打不过他",Toast.LENGTH_SHORT).show();
-                        //可能需要return
+                        return false;
                     }
                 }
             }
@@ -564,7 +569,7 @@ public class ChessPanel extends View  {
 
     }
 
-    //迷宫算法
+    //工兵的迷宫算法
     private static boolean solved(int [][]a,int begin,int end,int targetX,int targetY)
     {
         if (you)
@@ -701,5 +706,28 @@ public class ChessPanel extends View  {
     }
     private chess getValidPoint(int x, int y) {
         return new chess((int)(y/mLineHeight),(int)(x/mLineWidth));
+    }
+
+   public class  aab extends AsyncTask<Void,Integer,Boolean>
+    {
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            while (true) {
+                if (mbasedPanel.choice(Ch) != -1)
+                {
+                    Ch=mbasedPanel.choice(Ch);
+                    break;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            if (b)
+            {
+                loadchess(Ch);
+            }
+        }
     }
 }

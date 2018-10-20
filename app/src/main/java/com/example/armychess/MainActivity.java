@@ -32,6 +32,7 @@ import app.akexorcist.bluetotohspp.library.DeviceList;
 public class MainActivity extends AppCompatActivity{
     private Button CreateButton;
     private Button JoinButton;
+    private Button CreateBuju;
     private ProgressBar anwei;
     private String TAG = "主页";
     List<String> base = new ArrayList<>();
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity{
             distribution disk = new distribution();
             createdatabses();
             disk.setStore(base);
+            disk.setName("默认布局");
             disk.save();
         }
         /*
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity{
          * */
         CreateButton = (Button) findViewById(R.id.Creategame);
         JoinButton = (Button) findViewById(R.id.Joingame);
+        CreateBuju=(Button) findViewById(R.id.Createbuju);
         JoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,6 +82,13 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DeviceList.class);
                 startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
+            }
+        });
+        CreateBuju.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,custom_position.class);
+                startActivity(intent);
             }
         });
 
