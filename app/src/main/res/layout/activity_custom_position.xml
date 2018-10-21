@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
     <TextView
         android:id="@+id/zidingyi"
-        android:text="自定义布局"
+        android:text="拖动棋子以完成布局"
         android:textSize="26dp"
         android:layout_gravity="center"
         android:layout_width="wrap_content"

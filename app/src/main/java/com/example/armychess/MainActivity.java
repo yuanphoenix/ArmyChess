@@ -130,36 +130,36 @@ public class MainActivity extends AppCompatActivity{
     }
 
     void createdatabses() {
-        base.add("8,0,1");
-        base.add("8,1,11");
-        base.add("8,2,1");
-        base.add("8,3,10");
-        base.add("8,4,10");
+        base.add("8,0,3");
+        base.add("8,1,9");
+        base.add("8,2,4");
+        base.add("8,3,2");
+        base.add("8,4,8");
 
-        base.add("9,0,2");
-        base.add("9,2,3");
-        base.add("9,4,3");
+        base.add("9,0,7");
+        base.add("9,2,10");
+        base.add("9,4,2");
 
-        base.add("10,0,3");
-        base.add("10,1,4");
+        base.add("10,0,1");
+        base.add("10,1,2");
         base.add("10,3,4");
-        base.add("10,4,5");
+        base.add("10,4,3");
 
         base.add("11,0,5");
-        base.add("11,2,6");
+        base.add("11,2,1");
         base.add("11,4,6");
 
         base.add("12,0,7");
-        base.add("12,1,7");
-        base.add("12,2,8");
-        base.add("12,3,9");
-        base.add("12,4,2");
+        base.add("12,1,1");
+        base.add("12,2,11");
+        base.add("12,3,6");
+        base.add("12,4,5");
 
-        base.add("13,0,1");
-        base.add("13,1,11");
+        base.add("13,0,11");
+        base.add("13,1,12");
         base.add("13,2,11");
-        base.add("13,3,2");
-        base.add("13,4,12");
+        base.add("13,3,10");
+        base.add("13,4,3");
     }
 
 

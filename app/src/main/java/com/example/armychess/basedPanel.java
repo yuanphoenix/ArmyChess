@@ -34,6 +34,7 @@ public class basedPanel extends AppCompatActivity {
     private int Ch=-1;
     private Button regret;
     private Button touxiang;
+    private ChessPanel chessPanel;
     List<String > whatchoice=new ArrayList<>();
 
     @Override
@@ -52,8 +53,23 @@ public class basedPanel extends AppCompatActivity {
         setContentView(R.layout.activity_based_panel);
         touxiang=findViewById(R.id.touxiang);
         regret=findViewById(R.id.huiqi);
-        ChessPanel chessPanel=findViewById(R.id.drawing);
+        chessPanel=findViewById(R.id.drawing);
         chessPanel.setButton(regret,touxiang);
+    }
+    long lastBackPressed = 0;
+    @Override
+    public void onBackPressed() {
+        //当前时间
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastBackPressed < 2000) {
+            {
+                super.onBackPressed();
+                chessPanel.divorce();
+            }
+        } else {
+            Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+        }
+        lastBackPressed = currentTime;
     }
     public void showDialog()
     {

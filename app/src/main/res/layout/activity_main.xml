@@ -13,6 +13,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:textSize="20sp"
         android:gravity="center"
         android:text="创建游戏" />
     <Button
@@ -21,6 +22,7 @@
         android:layout_below="@id/Creategame"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:textSize="20sp"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:text="加入游戏" />
@@ -29,6 +31,7 @@
         android:id="@+id/Createbuju"
         android:text="自定义布局"
         android:layout_width="200dp"
+        android:textSize="20sp"
         android:layout_below="@id/Joingame"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"

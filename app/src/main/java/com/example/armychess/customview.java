@@ -51,6 +51,7 @@ public class customview extends View {
         setBackgroundColor(0x44ff0000);
         //对画笔进行初始化
         mPaint.setColor(0x88000000);
+        mPaint.setStrokeWidth(10);
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
         mPaint.setStyle( Paint.Style.STROKE);
@@ -229,6 +230,19 @@ public class customview extends View {
         //第四象限
         canvas.drawLine((int) (X+ratioOfCilcle*lineHeight*cos),Y+ratioOfCilcle*lineHeight*sin, X+lineWidth-ratioOfCilcle*lineHeight*cos,Y+lineHeight-ratioOfCilcle*lineHeight*sin,mPaint);
         canvas.drawLine(X+2*lineWidth,Y+2*lineHeight,X+lineWidth+ratioOfCilcle*lineHeight*cos,Y+lineHeight+lineHeight*ratioOfCilcle*sin,mPaint);
+
+        //斜线第二象限
+        canvas.drawLine(X,Y-2*lineHeight,X-lineWidth+ratioOfCilcle*lineHeight*cos,Y-lineHeight-lineHeight*ratioOfCilcle*sin,mPaint);
+        canvas.drawLine(X-2*lineWidth,Y,X-lineWidth-ratioOfCilcle*lineHeight*cos,Y-lineHeight+ratioOfCilcle*lineHeight*sin,mPaint);
+        //斜线第一象限
+        canvas.drawLine(X,Y-2*lineHeight,X+lineWidth-lineHeight*ratioOfCilcle*cos,Y-lineHeight-lineHeight*ratioOfCilcle*sin,mPaint);
+        canvas.drawLine(X+2*lineWidth,Y,X+lineWidth+ratioOfCilcle*lineHeight*cos,Y-lineHeight+ratioOfCilcle*lineHeight*sin,mPaint);
+        //斜线第三象限
+        canvas.drawLine(X-2*lineWidth,Y,X-lineWidth-lineHeight*ratioOfCilcle*cos,Y+lineHeight-ratioOfCilcle*lineHeight*sin,mPaint);
+        canvas.drawLine(X,Y+2*lineHeight,X-lineWidth+ratioOfCilcle*lineHeight*cos,Y+lineHeight+ratioOfCilcle*lineHeight*sin,mPaint);
+        //斜线第四象限
+        canvas.drawLine(X+2*lineWidth,Y,X+lineWidth+ratioOfCilcle*lineHeight*cos,Y+lineHeight-ratioOfCilcle*lineHeight*sin,mPaint);
+        canvas.drawLine(X,Y+2*lineHeight,X+lineWidth-ratioOfCilcle*lineHeight*cos,Y+lineHeight+lineHeight*ratioOfCilcle*sin,mPaint);
     }
     private void drawPieces(Canvas canvas) {
         int pieceWidth= (int) (mLineHeight*ratioPieceOfLineHeight);
@@ -288,8 +302,28 @@ public class customview extends View {
             SecondPosition=getValidPoint(x,y);
             if (mine.contains(FirstChess)&&mine.contains(SecondPosition))
             {
+
                 int a= mine.get(mine.indexOf(FirstChess)).getWeight();
                 int b=mine.get(mine.indexOf(SecondPosition)).getWeight();
+                int FX=FirstChess.getX();
+                int FY=FirstChess.getY();
+                int SX=SecondPosition.getX();
+                int SY=SecondPosition.getY();
+                if ((SX==8&&a==10)||(b==10&&FX==8))
+                {
+                    Toast.makeText(getContext(),"炸弹不能放在第一排",Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if ( (a==11&&(SX!=12&&SX!=13))||  (b==11&&(FX!=12&&FX!=13) ) )
+                {
+                    Toast.makeText(getContext(),"地雷只能放在后两排",Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if ((a==12&&(SX!=13|| (SY!=1&&SY!=3) ) )  || (b==12&&(FX!=13|| (FY!=1&&FY!=3)))  )
+                {
+                    Toast.makeText(getContext(),"军棋只能放在行营",Toast.LENGTH_SHORT).show();
+                    return false;
+                }
                 mine.get(mine.indexOf(FirstChess)).setWeight(b);
                 mine.get(mine.indexOf(SecondPosition)).setWeight(a);
                 invalidate();

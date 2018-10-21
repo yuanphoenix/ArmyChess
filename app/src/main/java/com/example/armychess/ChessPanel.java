@@ -44,6 +44,7 @@ public class ChessPanel extends View  {
     private String address="a";
     private BluetoothSPP st;
     private chess FirstChess;//记录第一次点击的位置
+    private chess targetChess;
     private int mPanelWidth;//整个棋盘的宽度
     private float mLineHeight;//每一行的高度
     private float mLineWidth;
@@ -76,7 +77,7 @@ public class ChessPanel extends View  {
         mPaint.setColor(0x88000000);
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-
+        mPaint.setStrokeWidth(10);
         mbasedPanel=(basedPanel) context;
         mPaint.setStyle( Paint.Style.STROKE);
 
@@ -252,7 +253,7 @@ public class ChessPanel extends View  {
         temp= db.getStore();
         for (int i=0;i<temp.size();i++)
         {
-            String gui=temp.get(i);//用于从temp中取出一个数据
+            String gui=temp.get(i);
             st.send(gui,true);
             String a,b,c;
             int fir=0;int second=0;
@@ -317,6 +318,18 @@ public class ChessPanel extends View  {
                     (p.x+(1-ratioPieceOfLineHeight)/2)*mLineHeight,null
             );
         }
+        if (Who&&targetChess!=null )
+        {
+            if (mine.contains(targetChess))
+            {
+                chess p=mine.get(mine.indexOf(targetChess));
+                canvas.drawBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),(int)map.get(p.getWeight())),(int)(pieceHeight*1.2),(int)(pieceWidth*1.2),false),
+                        (p.y+(1-ratioPieceOfLineHeight)/2)*mLineWidth,
+                        (p.x+(1-ratioPieceOfLineHeight)/2)*mLineHeight,null
+                );
+            }
+            targetChess=null;
+        }
 
         for (int i=0;i<enemy.size();i++)
         {
@@ -326,6 +339,7 @@ public class ChessPanel extends View  {
                     (p.y+(1-ratioPieceOfLineHeight)/2)*mLineWidth,
                     (p.x+(1-ratioPieceOfLineHeight)/2)*mLineHeight,null
             );
+
         }
     }
     /*
@@ -466,8 +480,11 @@ public class ChessPanel extends View  {
             if (IsFirst)
             {
                 FirstChess=getValidPoint(x,y);
+
                 if (mine.contains(FirstChess))
                 {
+                    targetChess=getValidPoint(x,y);
+                    invalidate();
                     if (mine.get(mine.indexOf(FirstChess)).getWeight()<11)
                     {
                         IsFirst=!IsFirst;
@@ -483,6 +500,7 @@ public class ChessPanel extends View  {
                 }
                 return true;
             }
+
             chess SecondPosition=getValidPoint(x,y);
             if (SecondPosition.getX()==6||SecondPosition.getX()==7)
             {
@@ -493,6 +511,8 @@ public class ChessPanel extends View  {
             {
                 //换成本方的另一个棋子
                FirstChess=SecondPosition;
+               targetChess=getValidPoint(x,y);
+               invalidate();
                return true;
             } else if (enemy.contains(SecondPosition))//那个位置有敌人的棋子
             {
@@ -782,7 +802,12 @@ public class ChessPanel extends View  {
     private chess getValidPoint(int x, int y) {
         return new chess((int)(y/mLineHeight),(int)(x/mLineWidth));
     }
-
+    //断开连接
+    public void divorce()
+    {
+        st.stopService();
+        st.disconnect();
+    }
     private void showDialog()
     {
         new AlertDialog.Builder(getContext()).setTitle("对方想要悔棋")
@@ -876,4 +901,5 @@ public class ChessPanel extends View  {
             }
         }
     }
+
 }
