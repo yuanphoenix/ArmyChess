@@ -3,12 +3,14 @@ package com.example.armychess;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,6 +42,18 @@ public class basedPanel extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
+        android.support.v7.app.ActionBar actionBar=getSupportActionBar();
+        if (actionBar!=null)
+        {
+            actionBar.hide();
+        }
+
         List <distribution> distri=DataSupport.findAll(distribution.class);
         for (distribution dis:distri)
         {

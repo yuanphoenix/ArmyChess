@@ -54,7 +54,7 @@ public class ChessPanel extends View  {
     private float ratioPieceOfLineHeight=3*1.0f/4;
     float ratioOfCilcle=1*1.0f/2;//为了画圆圈而定制的比例
     private Paint mPaint = new Paint();
-
+    private Paint rail=new Paint();
     private Stack<List> Regretmine=new Stack<>();
     private Stack<List> Regretenemy=new Stack<>();
     private List<chess> mine = new ArrayList<>();
@@ -72,14 +72,20 @@ public class ChessPanel extends View  {
     * */
     public ChessPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setBackgroundColor(0x44ff0000);
+       // setBackgroundColor(0x44ff0000);
         //对画笔进行初始化
         mPaint.setColor(0x88000000);
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setStrokeWidth(10);
+        mPaint.setStrokeWidth(5);
         mbasedPanel=(basedPanel) context;
         mPaint.setStyle( Paint.Style.STROKE);
+
+        rail.setColor(0x88000000);
+        rail.setAntiAlias(true);
+        rail.setDither(true);
+        rail.setStrokeWidth(10);
+        rail.setStyle( Paint.Style.STROKE);
 
         st=new BluetoothSPP(getContext());
         st.setupService();
@@ -381,7 +387,15 @@ public class ChessPanel extends View  {
                 canvas.drawLine(w-lineHeight-lineWidth+ratioOfCilcle*lineHeight,StartY,w-lineHeight,StartY,mPaint);
                 continue;
             }
-            canvas.drawLine(StartX,StartY,EndX,StartY,mPaint);
+            if (i==1||i==5||i==8||i==12)
+            {
+                canvas.drawLine(StartX,StartY,EndX,StartY,rail);
+            }
+            else
+            {
+                canvas.drawLine(StartX,StartY,EndX,StartY,mPaint);
+            }
+
         }
 
         for (int i=0;i<5;i++)//为了画竖线
@@ -416,7 +430,9 @@ public class ChessPanel extends View  {
             canvas.drawLine(StartX,(float)8.5*lineHeight,StartX,10*lineHeight,mPaint);
             canvas.drawLine(StartX,11*lineHeight,StartX,(float) 13.5*lineHeight,mPaint);
         }
-        canvas.drawLine(lineHeight+2*lineWidth,(int)5.5*lineHeight,lineHeight+2*lineWidth,(int)9.5*lineHeight,mPaint);
+        canvas.drawLine(lineHeight+2*lineWidth,(float) 5.5*lineHeight,lineHeight+2*lineWidth,(float) 8.5*lineHeight,rail);
+        canvas.drawLine(lineHeight,(float)1.5*lineHeight,lineHeight,(float) 12.5*lineHeight,rail);
+        canvas.drawLine((float) 4*lineWidth+lineHeight,(float)1.5*lineHeight,(float)  4*lineWidth+lineHeight,(float) 12.5*lineHeight,rail);
         //开始画斜线
         lean((int )( lineHeight+2*lineWidth), (int) (3.5*lineHeight),canvas);
         lean((int )( lineHeight+2*lineWidth),(int) (10.5*lineHeight),canvas);
@@ -474,7 +490,6 @@ public class ChessPanel extends View  {
             Toast.makeText(getContext(),"现在是对方在下",Toast.LENGTH_SHORT).show();
             return false;
         }
-        SaveChess();
         int action=event.getAction();
         if (action==MotionEvent.ACTION_UP)
         {
@@ -545,6 +560,7 @@ public class ChessPanel extends View  {
                     {
                         if (enemyWeight== -11)//工兵干掉地雷
                         {
+                            SaveChess();
                             enemy.remove(indexOfenemy);
                             IsFirst=!IsFirst;
                             mine.remove(index);
@@ -566,6 +582,7 @@ public class ChessPanel extends View  {
                                 return false;
                             }
                         }
+                        SaveChess();
                         enemy.remove(indexOfenemy);
                         IsFirst=!IsFirst;
                         mine.remove(index);
@@ -581,6 +598,7 @@ public class ChessPanel extends View  {
                     //普通的吃子。既然可以到达，那么比较权重。
                     if (weight>Math.abs(enemyWeight))
                     {
+                        SaveChess();
                         enemy.remove(indexOfenemy);
                         IsFirst=!IsFirst;
                         mine.remove(index);
@@ -603,6 +621,7 @@ public class ChessPanel extends View  {
             {
                if (JudgeRuler(FirstChess,SecondPosition))
                {
+                   SaveChess();
                    IsFirst=!IsFirst;
                    int index=mine.indexOf(FirstChess);
                    int  weight=mine.get(index).getWeight();
@@ -669,6 +688,7 @@ public class ChessPanel extends View  {
     {
         int wofang=0;
         int difang=0;
+        SaveChess();
         wofang=mine.indexOf(begin);
         difang=enemy.indexOf(end);
         mine.remove(mine.indexOf(begin));
@@ -767,7 +787,7 @@ public class ChessPanel extends View  {
         }
 
         //考虑普通路线，如果相差的只有一个格子，那么就可以到达。
-        if (Math.abs(begin.getY()-end.getY()+begin.getX()-end.getX())==1)
+        if (Math.abs(begin.getY()-end.getY()+begin.getX()-end.getX())==1&&(begin.getX()==end.getX()||begin.getY()==end.getY()))
         {
             return true;
         }
