@@ -398,7 +398,7 @@ public class ChessPanel extends View  {
             canvas.drawLine(StartX,(float)8.5*lineHeight,StartX,10*lineHeight,mPaint);
             canvas.drawLine(StartX,11*lineHeight,StartX,(float) 13.5*lineHeight,mPaint);
         }
-
+        canvas.drawLine(lineHeight+2*lineWidth,(int)5.5*lineHeight,lineHeight+2*lineWidth,(int)9.5*lineHeight,mPaint);
         //开始画斜线
         lean((int )( lineHeight+2*lineWidth), (int) (3.5*lineHeight),canvas);
         lean((int )( lineHeight+2*lineWidth),(int) (10.5*lineHeight),canvas);
@@ -426,6 +426,19 @@ public class ChessPanel extends View  {
         //第四象限
         canvas.drawLine((int) (X+ratioOfCilcle*lineHeight*cos),Y+ratioOfCilcle*lineHeight*sin, X+lineWidth-ratioOfCilcle*lineHeight*cos,Y+lineHeight-ratioOfCilcle*lineHeight*sin,mPaint);
         canvas.drawLine(X+2*lineWidth,Y+2*lineHeight,X+lineWidth+ratioOfCilcle*lineHeight*cos,Y+lineHeight+lineHeight*ratioOfCilcle*sin,mPaint);
+
+        //斜线第二象限
+        canvas.drawLine(X,Y-2*lineHeight,X-lineWidth+ratioOfCilcle*lineHeight*cos,Y-lineHeight-lineHeight*ratioOfCilcle*sin,mPaint);
+        canvas.drawLine(X-2*lineWidth,Y,X-lineWidth-ratioOfCilcle*lineHeight*cos,Y-lineHeight+ratioOfCilcle*lineHeight*sin,mPaint);
+        //斜线第一象限
+        canvas.drawLine(X,Y-2*lineHeight,X+lineWidth-lineHeight*ratioOfCilcle*cos,Y-lineHeight-lineHeight*ratioOfCilcle*sin,mPaint);
+        canvas.drawLine(X+2*lineWidth,Y,X+lineWidth+ratioOfCilcle*lineHeight*cos,Y-lineHeight+ratioOfCilcle*lineHeight*sin,mPaint);
+        //斜线第三象限
+        canvas.drawLine(X-2*lineWidth,Y,X-lineWidth-lineHeight*ratioOfCilcle*cos,Y+lineHeight-ratioOfCilcle*lineHeight*sin,mPaint);
+        canvas.drawLine(X,Y+2*lineHeight,X-lineWidth+ratioOfCilcle*lineHeight*cos,Y+lineHeight+ratioOfCilcle*lineHeight*sin,mPaint);
+        //斜线第四象限
+        canvas.drawLine(X+2*lineWidth,Y,X+lineWidth+ratioOfCilcle*lineHeight*cos,Y+lineHeight-ratioOfCilcle*lineHeight*sin,mPaint);
+        canvas.drawLine(X,Y+2*lineHeight,X+lineWidth-ratioOfCilcle*lineHeight*cos,Y+lineHeight+lineHeight*ratioOfCilcle*sin,mPaint);
     }
     @Override
     /*
@@ -544,8 +557,6 @@ public class ChessPanel extends View  {
                     }
 
                     //普通的吃子。既然可以到达，那么比较权重。
-
-
                     if (weight>Math.abs(enemyWeight))
                     {
                         enemy.remove(indexOfenemy);
@@ -561,6 +572,9 @@ public class ChessPanel extends View  {
                         Toast.makeText(getContext(),"你打不过他",Toast.LENGTH_SHORT).show();
                         return false;
                     }
+                }
+                else {
+                    Toast.makeText(getContext(),"走不到那里",Toast.LENGTH_SHORT).show();
                 }
             }
             else//那里没有棋子
@@ -793,7 +807,7 @@ public class ChessPanel extends View  {
 
 
     }
-
+    //栈保存棋子
     private void SaveChess()
     {
         List<chess> savemine = new ArrayList<>();

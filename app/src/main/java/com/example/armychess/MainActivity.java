@@ -1,10 +1,12 @@
 package com.example.armychess;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.drm.DrmStore;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -33,7 +36,6 @@ public class MainActivity extends AppCompatActivity{
     private Button CreateButton;
     private Button JoinButton;
     private Button CreateBuju;
-    private ProgressBar anwei;
     private String TAG = "主页";
     List<String> base = new ArrayList<>();
 
@@ -45,13 +47,21 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        anwei = (ProgressBar) findViewById(R.id.anwei);
-        anwei.setVisibility(View.GONE);
         bt = new BluetoothSPP(this);
         /***
          *对本地数据库进行初始化。
          */
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
+        android.support.v7.app.ActionBar actionBar=getSupportActionBar();
+        if (actionBar!=null)
+        {
+            actionBar.hide();
+        }
         LitePal.getDatabase();
         List<distribution> kong = DataSupport.findAll(distribution.class);
         if (kong.size() == 0) {
@@ -65,13 +75,12 @@ public class MainActivity extends AppCompatActivity{
          *
          * 开始实例化Button
          * */
-        CreateButton = (Button) findViewById(R.id.Creategame);
-        JoinButton = (Button) findViewById(R.id.Joingame);
+        CreateButton = (Button) findViewById(R.id.Joingame);
+        JoinButton = (Button) findViewById(R.id.Creategame);
         CreateBuju=(Button) findViewById(R.id.Createbuju);
         JoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // anwei.setVisibility(View.VISIBLE);
                 Intent intent = new Intent(getApplicationContext(), basedPanel.class);
                 intent.putExtra("address" ,"miss");
                 startActivity(intent);
@@ -102,7 +111,6 @@ public class MainActivity extends AppCompatActivity{
                 Toast.makeText(getApplicationContext()
                         , "Connected to " + name + "\n" + address
                         , Toast.LENGTH_SHORT).show();
-                anwei.setVisibility(View.GONE);
 
                 //可能需要加一个判断条件。
                 Intent intent = new Intent(MainActivity.this, basedPanel.class);
@@ -234,5 +242,17 @@ public class MainActivity extends AppCompatActivity{
                 }
                 break;
         }
+    }
+    long lastBackPressed = 0;
+    @Override
+    public void onBackPressed() {
+        //当前时间
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastBackPressed < 2000) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+        }
+        lastBackPressed = currentTime;
     }
 }
