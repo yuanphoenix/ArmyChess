@@ -16,6 +16,5 @@ public class custom_position extends AppCompatActivity {
         customview custom= findViewById(R.id.custom);
         Button save= findViewById(R.id.savebuju);
         custom.setButton(save);
-
     }
 }

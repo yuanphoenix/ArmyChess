@@ -108,6 +108,11 @@ public class ChessPanel extends View  {
                     Who=!Who;
                     invalidate();
                     return;
+                }else if (message.equals("投降"))
+                {
+                    isGameOver=true;
+                    Success();
+                    return;
                 }
                 if (indexofchess < 25) {
                     String a, b, c;
@@ -171,8 +176,8 @@ public class ChessPanel extends View  {
                         mine.remove(mine.indexOf(new chess(13 - pointx, 4 - pointy ) ));
                     }
                     Who = !Who;
-
                     invalidate();
+                    GameOver();
                 }
             }
         });
@@ -333,7 +338,6 @@ public class ChessPanel extends View  {
 
         for (int i=0;i<enemy.size();i++)
         {
-
             chess p=enemy.get(i);
             canvas.drawBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),(int)map.get(p.getWeight())),pieceHeight,pieceWidth,false),
                     (p.y+(1-ratioPieceOfLineHeight)/2)*mLineWidth,
@@ -460,15 +464,14 @@ public class ChessPanel extends View  {
     * 要注意第一次点击的不是本方棋子的情况。
     * */
     public boolean onTouchEvent(MotionEvent event) {
-        if (!Who)
-        {
-            Toast.makeText(getContext(),"现在是对方在下",Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
         if (isGameOver)
         {
             Toast.makeText(getContext(),"游戏已经结束",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (!Who)
+        {
+            Toast.makeText(getContext(),"现在是对方在下",Toast.LENGTH_SHORT).show();
             return false;
         }
         SaveChess();
@@ -571,7 +574,6 @@ public class ChessPanel extends View  {
                         st.send(mess,true);
                         Who=!Who;
                         //游戏结束
-                        isGameOver=true;
                         invalidate();
                         return true;
                     }
@@ -621,26 +623,44 @@ public class ChessPanel extends View  {
         return true;
     }
 
-    //判断胜负算法
+    /*
+    * ①对方投降认输
+    * ②吃光所有能动的棋子
+    * ③地雷+军旗都被消灭
+    *
+    * */
     private boolean GameOver()
     {
-        int numsofenenmy=0;
-        int size=enemy.size();
+        boolean dileijunqi=false;
+        boolean chiganjing=false;
+        int numsofenenmy=0;//能动的我方人数
+        int leiqi=0;//地雷和军旗的数量
+        int size=mine.size();
         for (int i=0;i<size;i++)
         {
-            if (enemy.get(i).getWeight()<11)
+            if (mine.get(i).getWeight()<11)
             {
                 numsofenenmy++;
-                break;
+            }
+            else
+            {
+                leiqi++;
             }
         }
-        if (numsofenenmy!=0)
+     if (numsofenenmy==0)
+         chiganjing=true;
+        if (leiqi==0)
+            dileijunqi=true;
+        if (chiganjing||dileijunqi)
         {
-            return false;
+            st.send("投降",true);
+            Failed();
+            isGameOver=true;
+            return true;
         }
         else
         {
-            return true;
+            return false;
         }
     }
 
@@ -655,7 +675,6 @@ public class ChessPanel extends View  {
         enemy.remove(enemy.indexOf(end));
         //这里的weight为20，目的是为了接收数据时，筛选出去。
         st.send(""+wofang+","+end.getX()+","+end.getY()+","+"20",true);
-
         Who=!Who;
 
     }
@@ -736,7 +755,6 @@ public class ChessPanel extends View  {
                         }
                         road[end.getX()][end.getY()+1]=0;//工兵要达到的地方。
                         you=false;
-
                         solved(road,begin.getX(),begin.getY()+1,end.getX(),end.getY()+1);
                         if(you){
                             return true;
@@ -832,6 +850,61 @@ public class ChessPanel extends View  {
 
 
     }
+    private void renshu()
+    {
+        new AlertDialog.Builder(getContext()).setTitle("你确定要认输？")
+                .setIcon(android.R.drawable.sym_def_app_icon)
+                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        st.send("投降",true);
+                        Failed();
+                        isGameOver=true;
+                    }
+                })
+                .setNegativeButton("点错了", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }).show();
+    }
+    private void Success()
+    {
+        new AlertDialog.Builder(getContext()).setTitle("恭喜你战胜了对手！")
+                .setIcon(android.R.drawable.sym_def_app_icon)
+                .setPositiveButton("再来一局", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        isGameOver=true;
+                    }
+                })
+                .setNegativeButton("退出", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }).show();
+    }
+    private void Failed()
+    {
+        new AlertDialog.Builder(getContext()).setTitle("胜败乃兵家常事！")
+                .setIcon(android.R.drawable.sym_def_app_icon)
+                .setPositiveButton("再来一局", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                       //逻辑没写完
+                        isGameOver=true;
+                    }
+                })
+                .setNegativeButton("退出", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }).show();
+    }
     //栈保存棋子
     private void SaveChess()
     {
@@ -894,7 +967,7 @@ public class ChessPanel extends View  {
 
                     break;
                 case R.id.touxiang:
-
+                    renshu();
                     break;
                     default:
                         break;

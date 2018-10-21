@@ -74,7 +74,7 @@ public class customview extends View {
         map.put(11,R.drawable.d_mine);
         map.put(12,R.drawable.d_flag);
     }
-    private void loadchess()//该方法实现了对本方布阵棋子的加载。
+    private void loadchess()//该方法实现了对本方布阵棋子的加载
     {
         mine.clear();
         List<distribution> buju=DataSupport.findAll(distribution.class);

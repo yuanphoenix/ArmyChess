@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
-
+//创建默认的数据库内容
     void createdatabses() {
         base.add("8,0,3");
         base.add("8,1,9");
