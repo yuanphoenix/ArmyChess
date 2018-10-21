@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity{
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, BluetoothState.REQUEST_ENABLE_BT);
         } else {
-            // Do something if bluetooth is already enable
+            // 打开蓝牙之后做的事
             if (!bt.isServiceAvailable()) {
                 setup();
             }
