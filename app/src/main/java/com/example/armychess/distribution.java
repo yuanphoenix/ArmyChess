@@ -4,7 +4,10 @@ import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+* 数据库类
+*
+* */
 public class distribution extends DataSupport {
     private List<String> store=new ArrayList<>();
     private String name;

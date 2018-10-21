@@ -1,6 +1,11 @@
 package com.example.armychess;
 
 import android.graphics.Point;
+/**
+ *
+ *
+ * 棋子类，继承自Point
+ */
 
 public class chess extends Point {
     private int weight;

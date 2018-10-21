@@ -10,14 +10,30 @@
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/huiqi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </LinearLayout>
+            <Button
+                android:id="@+id/huiqi"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_marginRight="60dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:text="悔棋" />
+
+
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/touxiang"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="重来" />
+        </LinearLayout>
+
+
 </LinearLayout>

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -20,7 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
-
+/*
+* 这个活动是view的依托，view是建立在这个类上面的
+*
+* */
 public class basedPanel extends AppCompatActivity {
     private static final String TAG="basedPanel";
     private ListView listView;
@@ -28,6 +32,8 @@ public class basedPanel extends AppCompatActivity {
     private AlertDialog alertDialog;
     private String receive="miss";
     private int Ch=-1;
+    private Button regret;
+    private Button touxiang;
     List<String > whatchoice=new ArrayList<>();
 
     @Override
@@ -44,9 +50,10 @@ public class basedPanel extends AppCompatActivity {
         Log.d(TAG, "onCreate: "+receive);
 
         setContentView(R.layout.activity_based_panel);
-
-
-
+        touxiang=findViewById(R.id.touxiang);
+        regret=findViewById(R.id.huiqi);
+        ChessPanel chessPanel=findViewById(R.id.drawing);
+        chessPanel.setButton(regret,touxiang);
     }
     public void showDialog()
     {

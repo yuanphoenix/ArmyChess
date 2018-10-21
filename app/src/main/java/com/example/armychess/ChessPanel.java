@@ -1,6 +1,8 @@
 package com.example.armychess;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
@@ -22,11 +25,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.WeakHashMap;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
-
+/*
+*
+* 这个view是蓝牙对战的核心。包括了对战的所有功能
+* */
 public class ChessPanel extends View  {
     private String TAG="棋子";
     private boolean isGameOver=false;
@@ -46,9 +53,16 @@ public class ChessPanel extends View  {
     private float ratioPieceOfLineHeight=3*1.0f/4;
     float ratioOfCilcle=1*1.0f/2;//为了画圆圈而定制的比例
     private Paint mPaint = new Paint();
+
+    private Stack<List> Regretmine=new Stack<>();
+    private Stack<List> Regretenemy=new Stack<>();
     private List<chess> mine = new ArrayList<>();
     private List<chess> enemy = new ArrayList<>();
     private List<chess> xingying=new ArrayList<>();
+
+    private ButtonListener buttonListener=new ButtonListener();
+    private Button  regret;
+    private Button touxiang;
     private int indexofchess=0;//这是为了统计到底是修改敌人棋子，还是增添敌人棋子。以25为界限
     basedPanel mbasedPanel;
     Map map=new HashMap();
@@ -76,10 +90,24 @@ public class ChessPanel extends View  {
             st.connect(address);
             Who=!Who;//此时创建者变为false
         }
+
+
         //蓝牙接受数据
         st.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
+                if (message.equals("悔棋"))
+                {
+                    showDialog();
+                    return;
+                }else if (message.equals("同意"))
+                {
+                    mine=Regretmine.pop();
+                    enemy=Regretenemy.pop();
+                    Who=!Who;
+                    invalidate();
+                    return;
+                }
                 if (indexofchess < 25) {
                     String a, b, c;
                     int fir = 0;
@@ -133,6 +161,7 @@ public class ChessPanel extends View  {
                     pointy = Integer.parseInt(c);
                     wei = Integer.parseInt(d);
                     delete=Integer.parseInt(a);
+                    SaveChess();
                     enemy.remove(delete);
                     if (wei<19)
                          enemy.add(new chess(13 - pointx, 4 - pointy, -1 * wei));
@@ -141,6 +170,7 @@ public class ChessPanel extends View  {
                         mine.remove(mine.indexOf(new chess(13 - pointx, 4 - pointy ) ));
                     }
                     Who = !Who;
+
                     invalidate();
                 }
             }
@@ -153,7 +183,7 @@ public class ChessPanel extends View  {
             public void onDeviceConnected(String name, String address) {
                 if (isFirstImport)
                 {
-                    new aab().execute();
+                    new  ChoiceZhen().execute();
                     isFirstImport=false;
                 }
             }
@@ -408,11 +438,13 @@ public class ChessPanel extends View  {
             Toast.makeText(getContext(),"现在是对方在下",Toast.LENGTH_SHORT).show();
             return false;
         }
+
         if (isGameOver)
         {
             Toast.makeText(getContext(),"游戏已经结束",Toast.LENGTH_SHORT).show();
             return false;
         }
+        SaveChess();
         int action=event.getAction();
         if (action==MotionEvent.ACTION_UP)
         {
@@ -449,9 +481,14 @@ public class ChessPanel extends View  {
                 //换成本方的另一个棋子
                FirstChess=SecondPosition;
                return true;
-            }
-            else if (enemy.contains(SecondPosition))//那个位置有敌人的棋子
+            } else if (enemy.contains(SecondPosition))//那个位置有敌人的棋子
             {
+                int index=mine.indexOf(FirstChess);
+                int weight = mine.get(index).getWeight();
+                int indexOfenemy=enemy.indexOf(SecondPosition);
+                int enemyWeight=enemy.get(indexOfenemy).getWeight();
+
+
                 if(JudgeRuler(FirstChess,SecondPosition))
                 {
                     //行营的棋子不可以吃,这个的优先级最高。
@@ -461,20 +498,17 @@ public class ChessPanel extends View  {
                         return false;
                     }
                     //炸弹的同归于尽
-                    if (mine.get(mine.indexOf(FirstChess)).getWeight() == 10 || enemy.get(enemy.indexOf(SecondPosition)).getWeight() == -10 )
+                    if (weight == 10 || enemyWeight == -10 )
                     {
                         BothDie(FirstChess,SecondPosition);
                         invalidate();
                         return true;
                     }
                     //看我方是不是工兵，那么就吃掉地雷，军旗
-                    if (mine.get(mine.indexOf(FirstChess)).getWeight()==1)
+                    if (weight==1)
                     {
-                        if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()== -11)//工兵干掉地雷
+                        if (enemyWeight== -11)//工兵干掉地雷
                         {
-                            int index=mine.indexOf(FirstChess);
-                            int weight = mine.get(index).getWeight();
-                            int indexOfenemy=enemy.indexOf(SecondPosition);
                             enemy.remove(indexOfenemy);
                             IsFirst=!IsFirst;
                             mine.remove(index);
@@ -482,38 +516,36 @@ public class ChessPanel extends View  {
                             String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
                             st.send(mess,true);
                             Who=!Who;
+                            invalidate();
+                            return true;
                         }
-                        else if (enemy.get(enemy.indexOf(SecondPosition)).getWeight()==-12)//拔旗
-                        {
-                            for (int i=0;i<enemy.size();i++)
-                            {
-                                if (enemy.get(i).getWeight()==-11)
-                                {
-                                    return false;
-                                }
-                            }
-                            int index=mine.indexOf(FirstChess);
-                            int weight = mine.get(index).getWeight();
-                            int indexOfenemy=enemy.indexOf(SecondPosition);
-                            enemy.remove(indexOfenemy);
-                            IsFirst=!IsFirst;
-                            mine.remove(index);
-                            mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
-                            String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
-                            st.send(mess,true);
-                            Who=!Who;
-                            //游戏结束
-                            isGameOver=true;
-
-                        }
-                        Log.d(TAG, "onTouchEvent: 不是地雷和军旗");
                     }
+                    //扛走军旗
+                    if (enemyWeight==-12)//拔旗
+                    {
+                        for (int i=0;i<enemy.size();i++)
+                        {
+                            if (enemy.get(i).getWeight()==-11)
+                            {
+                                return false;
+                            }
+                        }
+                        enemy.remove(indexOfenemy);
+                        IsFirst=!IsFirst;
+                        mine.remove(index);
+                        mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
+                        String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
+                        st.send(mess,true);
+                        Who=!Who;
+                        //游戏结束
+                        isGameOver=true;
+                        invalidate();
+                        return true;
+                    }
+
                     //普通的吃子。既然可以到达，那么比较权重。
 
-                    int index=mine.indexOf(FirstChess);
-                    int weight = mine.get(index).getWeight();
-                    int indexOfenemy=enemy.indexOf(SecondPosition);
-                    int enemyWeight=enemy.get(indexOfenemy).getWeight();
+
                     if (weight>Math.abs(enemyWeight))
                     {
                         enemy.remove(indexOfenemy);
@@ -542,6 +574,7 @@ public class ChessPanel extends View  {
                    mine.add(new chess(SecondPosition.getX(),SecondPosition.getY(),weight));
                    String mess=""+index+","+SecondPosition.getX()+","+SecondPosition.getY()+","+weight;
                    st.send(mess,true);
+
                    Who=!Who;
                }
                else
@@ -552,6 +585,29 @@ public class ChessPanel extends View  {
         }
         invalidate();
         return true;
+    }
+
+    //判断胜负算法
+    private boolean GameOver()
+    {
+        int numsofenenmy=0;
+        int size=enemy.size();
+        for (int i=0;i<size;i++)
+        {
+            if (enemy.get(i).getWeight()<11)
+            {
+                numsofenenmy++;
+                break;
+            }
+        }
+        if (numsofenenmy!=0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     //同归于尽算法
@@ -565,6 +621,7 @@ public class ChessPanel extends View  {
         enemy.remove(enemy.indexOf(end));
         //这里的weight为20，目的是为了接收数据时，筛选出去。
         st.send(""+wofang+","+end.getX()+","+end.getY()+","+"20",true);
+
         Who=!Who;
 
     }
@@ -602,6 +659,8 @@ public class ChessPanel extends View  {
         }
         return false;
     }
+
+    //判断是否可以到达
     private boolean JudgeRuler(chess begin,chess end)
     {
         //工兵算法
@@ -704,11 +763,54 @@ public class ChessPanel extends View  {
         }
         return false;
     }
+
+    //获取坐标
     private chess getValidPoint(int x, int y) {
         return new chess((int)(y/mLineHeight),(int)(x/mLineWidth));
     }
 
-   public class  aab extends AsyncTask<Void,Integer,Boolean>
+    private void showDialog()
+    {
+        new AlertDialog.Builder(getContext()).setTitle("对方想要悔棋")
+              .setIcon(android.R.drawable.sym_def_app_icon)
+                .setPositiveButton("允许", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        st.send("同意",true);
+                     mine=Regretmine.pop();
+                     enemy=Regretenemy.pop();
+                     Who=!Who;
+                        invalidate();
+                    }
+                })
+                .setNegativeButton("不允许", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }).show();
+
+
+
+    }
+
+    private void SaveChess()
+    {
+        List<chess> savemine = new ArrayList<>();
+        List<chess> saveenemy = new ArrayList<>();
+        for (int i=0;i<mine.size();i++)
+        {
+            savemine.add(mine.get(i));
+        }
+        for (int i=0;i<enemy.size();i++)
+        {
+            saveenemy.add(enemy.get(i));
+        }
+        Regretmine.push(savemine);
+        Regretenemy.push(saveenemy);
+    }
+    //子线程
+   public class  ChoiceZhen extends AsyncTask<Void,Integer,Boolean>
     {
         @Override
         protected Boolean doInBackground(Void... voids) {
@@ -727,6 +829,36 @@ public class ChessPanel extends View  {
             if (b)
             {
                 loadchess(Ch);
+            }
+        }
+    }
+
+    public void setButton(Button regret,Button touxiang)
+    {
+        this.touxiang=touxiang;
+        this.regret=regret;
+        touxiang.setOnClickListener(buttonListener);
+        regret.setOnClickListener(buttonListener);
+    }
+
+    private class ButtonListener implements OnClickListener{
+        @Override
+        public void onClick(View v) {
+            switch (v.getId())
+            {
+                case R.id.huiqi:
+                    if (!Who)
+                    {
+                        Toast.makeText(getContext(),"已向对方发出申请",Toast.LENGTH_SHORT).show();
+                        st.send("悔棋",true);
+                    }
+
+                    break;
+                case R.id.touxiang:
+
+                    break;
+                    default:
+                        break;
             }
         }
     }

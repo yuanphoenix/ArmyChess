@@ -23,7 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
-
+/*
+*
+* 自定义布局的view
+* */
 public class customview extends View {
     private String TAG="自定义布局";
     private boolean isMove=false;
@@ -339,7 +342,12 @@ public class customview extends View {
                                         xijiayi.save();
                                     }
                                 }
-                            }).setNegativeButton("取消", null).show();
+                            })
+                            .setNegativeButton("取消", null).show();
+                    break;
+
+                case R.id.huiqi:
+
             }
         }
     }
