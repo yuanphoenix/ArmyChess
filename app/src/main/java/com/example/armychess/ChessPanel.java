@@ -870,6 +870,12 @@ public class ChessPanel extends View  {
 
 
     }
+    public void taopao()
+    {
+        if (!isGameOver)
+           st.send("投降",true);
+    }
+
     private void renshu()
     {
         new AlertDialog.Builder(getContext()).setTitle("你确定要认输？")

@@ -78,10 +78,11 @@ public class basedPanel extends AppCompatActivity {
         if (currentTime - lastBackPressed < 2000) {
             {
                 super.onBackPressed();
+                chessPanel.taopao();
                 chessPanel.divorce();
             }
         } else {
-            Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "再按一次返回界面", Toast.LENGTH_SHORT).show();
         }
         lastBackPressed = currentTime;
     }
