@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity{
     private Button CreateButton;
     private Button JoinButton;
     private Button CreateBuju;
+    private Button Jieshao;
     private String TAG = "主页";
     List<String> base = new ArrayList<>();
 
@@ -78,6 +79,14 @@ public class MainActivity extends AppCompatActivity{
         CreateButton = (Button) findViewById(R.id.Joingame);
         JoinButton = (Button) findViewById(R.id.Creategame);
         CreateBuju=(Button) findViewById(R.id.Createbuju);
+        Jieshao=findViewById(R.id.jieshao);
+        Jieshao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,help.class);
+                startActivity(intent);
+            }
+        });
         JoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

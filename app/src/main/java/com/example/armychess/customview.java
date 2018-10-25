@@ -374,6 +374,7 @@ public class customview extends View {
                                         }
                                         xijiayi.setStore(add);
                                         xijiayi.save();
+                                        Toast.makeText(getContext(),"保存成功",Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             })
