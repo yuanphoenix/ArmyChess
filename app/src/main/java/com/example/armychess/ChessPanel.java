@@ -65,6 +65,8 @@ public class ChessPanel extends View  {
     private Button  regret;
     private Button touxiang;
     private int indexofchess=0;//这是为了统计到底是修改敌人棋子，还是增添敌人棋子。以25为界限
+    private int bushu=0;//这是统计走了几步
+    private int huiqicishu=3;
     basedPanel mbasedPanel;
     Map map=new HashMap();
     /*
@@ -182,6 +184,7 @@ public class ChessPanel extends View  {
                         mine.remove(mine.indexOf(new chess(13 - pointx, 4 - pointy ) ));
                     }
                     Who = !Who;
+                    bushu++;
                     invalidate();
                     GameOver();
                 }
@@ -202,7 +205,9 @@ public class ChessPanel extends View  {
 
             @Override
             public void onDeviceDisconnected() {
-
+                mine.clear();
+                enemy.clear();
+                Linklost();
             }
 
             @Override
@@ -899,17 +904,23 @@ public class ChessPanel extends View  {
     {
         new AlertDialog.Builder(getContext()).setTitle("恭喜你战胜了对手！")
                 .setIcon(android.R.drawable.sym_def_app_icon)
-                .setPositiveButton("再来一局", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        isGameOver=true;
-                    }
-                })
                 .setNegativeButton("退出", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        return;
+                        divorce();
+                        mbasedPanel.back();
+                    }
+                }).show();
+    }
+    private void Linklost()
+    {
+        new AlertDialog.Builder(getContext()).setTitle("连接断开")
+                .setIcon(android.R.drawable.sym_def_app_icon)
+                .setNegativeButton("退出", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        divorce();
+                        mbasedPanel.back();
                     }
                 }).show();
     }
@@ -917,16 +928,11 @@ public class ChessPanel extends View  {
     {
         new AlertDialog.Builder(getContext()).setTitle("胜败乃兵家常事！")
                 .setIcon(android.R.drawable.sym_def_app_icon)
-                .setPositiveButton("再来一局", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                       //逻辑没写完
-                        isGameOver=true;
-                    }
-                })
                 .setNegativeButton("退出", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        divorce();
+                        mbasedPanel.back();
                         return;
                     }
                 }).show();
@@ -987,8 +993,15 @@ public class ChessPanel extends View  {
                 case R.id.huiqi:
                     if (!Who)
                     {
-                        Toast.makeText(getContext(),"已向对方发出申请",Toast.LENGTH_SHORT).show();
-                        st.send("悔棋",true);
+                        if (bushu>5&&huiqicishu!=0)
+                        {
+                            Toast.makeText(getContext(),"已向对方发出申请",Toast.LENGTH_SHORT).show();
+                            mbasedPanel.change();
+                            st.send("悔棋",true);
+                        }else
+                        {
+                            Toast.makeText(getContext(),"不到5步不能悔棋",Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     break;

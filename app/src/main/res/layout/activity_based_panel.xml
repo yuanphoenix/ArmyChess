@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:gravity="center"
-                android:text="悔棋" />
+                android:text="悔棋（3）" />
 
 
             <Button

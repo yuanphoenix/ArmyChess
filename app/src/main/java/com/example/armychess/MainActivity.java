@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DeviceList.class);
+                intent.putExtra("scan_for_devices","扫描新设备");
                 startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
             }
         });

@@ -34,6 +34,7 @@ public class basedPanel extends AppCompatActivity {
     private AlertDialog alertDialog;
     private String receive="miss";
     private int Ch=-1;
+    private int huiqicishu=3;
     private Button regret;
     private Button touxiang;
     private ChessPanel chessPanel;
@@ -86,6 +87,11 @@ public class basedPanel extends AppCompatActivity {
         }
         lastBackPressed = currentTime;
     }
+    public void back()
+    {
+        finish();
+    }
+
     public void showDialog()
     {
         Context context=basedPanel.this;
@@ -122,5 +128,11 @@ public class basedPanel extends AppCompatActivity {
     {
         a=this.Ch;
         return a;
+    }
+    public void change()
+    {
+            huiqicishu--;
+            regret.setText("悔棋（"+huiqicishu+"）");
+
     }
 }
