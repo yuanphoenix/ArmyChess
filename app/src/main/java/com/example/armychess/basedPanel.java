@@ -129,10 +129,15 @@ public class basedPanel extends AppCompatActivity {
         a=this.Ch;
         return a;
     }
-    public void change()
+    public boolean change()
     {
             huiqicishu--;
-            regret.setText("悔棋（"+huiqicishu+"）");
+            if (huiqicishu>=0)
+            {
+                regret.setText("悔棋（"+huiqicishu+"）");
+                return true;
+            }
+                return false;
 
     }
 }

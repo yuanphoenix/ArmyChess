@@ -533,6 +533,11 @@ public class ChessPanel extends View  {
             if (mine.contains(SecondPosition))
             {
                 //换成本方的另一个棋子
+                if(mine.get(mine.indexOf(SecondPosition)).getWeight()>10)
+                {
+                    Toast.makeText(getContext(),"地雷军旗不可移动" ,Toast.LENGTH_SHORT).show();
+                    return false;
+                }
                FirstChess=SecondPosition;
                targetChess=getValidPoint(x,y);
                invalidate();
@@ -993,11 +998,13 @@ public class ChessPanel extends View  {
                 case R.id.huiqi:
                     if (!Who)
                     {
-                        if (bushu>5&&huiqicishu!=0)
+                        if (bushu>5)
                         {
-                            Toast.makeText(getContext(),"已向对方发出申请",Toast.LENGTH_SHORT).show();
-                            mbasedPanel.change();
-                            st.send("悔棋",true);
+                            if (mbasedPanel.change())
+                            {
+                                Toast.makeText(getContext(),"已向对方发出申请",Toast.LENGTH_SHORT).show();
+                                st.send("悔棋",true);
+                            }
                         }else
                         {
                             Toast.makeText(getContext(),"不到5步不能悔棋",Toast.LENGTH_SHORT).show();

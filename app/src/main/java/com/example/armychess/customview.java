@@ -203,6 +203,7 @@ public class customview extends View {
             canvas.drawLine(StartX,11*lineHeight,StartX,(float) 13.5*lineHeight,mPaint);
         }
 
+         //   canvas.drawRect(lineWidth,0,2*lineWidth,lineHeight,mPaint);
         //开始画斜线
         lean((int )( lineHeight+2*lineWidth), (int) (3.5*lineHeight),canvas);
         lean((int )( lineHeight+2*lineWidth),(int) (10.5*lineHeight),canvas);
@@ -321,7 +322,7 @@ public class customview extends View {
                 }
                 if ((a==12&&(SX!=13|| (SY!=1&&SY!=3) ) )  || (b==12&&(FX!=13|| (FY!=1&&FY!=3)))  )
                 {
-                    Toast.makeText(getContext(),"军棋只能放在行营",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),"军棋只能放在大本营",Toast.LENGTH_SHORT).show();
                     return false;
                 }
                 mine.get(mine.indexOf(FirstChess)).setWeight(b);
