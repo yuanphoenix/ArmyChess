@@ -31,16 +31,17 @@ import java.util.WeakHashMap;
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 /*
-*
 * 这个view是蓝牙对战的核心。包括了对战的所有功能
 * */
 public class ChessPanel extends View  {
-    private String TAG="棋子";
+    private static String TAG="棋子";
     private boolean isGameOver=false;
     private boolean Who=true;//判断谁先手，谁创建对局谁先手
     private boolean IsFirst=true;//判断落子的顺序，点击棋子，再次点击要落的区域
     private boolean isFirstImport=true;//这里是指第一次连接后，要将布局发送给对方。
+
     private static boolean you=false;
+
     private String address="a";
     private BluetoothSPP st;
     private chess FirstChess;//记录第一次点击的位置
@@ -60,7 +61,6 @@ public class ChessPanel extends View  {
     private List<chess> mine = new ArrayList<>();
     private List<chess> enemy = new ArrayList<>();
     private List<chess> xingying=new ArrayList<>();
-
     private ButtonListener buttonListener=new ButtonListener();
     private Button  regret;
     private Button touxiang;
@@ -218,6 +218,8 @@ public class ChessPanel extends View  {
 
         init();
     }
+
+
     //初始化权重对应的图片
     private void init() {
         map.put(1,R.drawable.d_gongbing);
@@ -359,9 +361,7 @@ public class ChessPanel extends View  {
     }
     /*
     * 绘制棋盘
-    *
-    *
-    * */
+    **/
     private void drawBoard(Canvas canvas) {
         int w = mPanelWidth;
         float lineWidth= mLineWidth;
@@ -442,6 +442,10 @@ public class ChessPanel extends View  {
         lean((int )( lineHeight+2*lineWidth), (int) (3.5*lineHeight),canvas);
         lean((int )( lineHeight+2*lineWidth),(int) (10.5*lineHeight),canvas);
     }
+
+   /*
+     * 这是画斜线
+    */
     void lean(int X,int Y,Canvas canvas)
     {
         float lineWidth= mLineWidth;
@@ -548,7 +552,6 @@ public class ChessPanel extends View  {
                 int weight = mine.get(index).getWeight();
                 int indexOfenemy=enemy.indexOf(SecondPosition);
                 int enemyWeight=enemy.get(indexOfenemy).getWeight();
-
 
                 if(JudgeRuler(FirstChess,SecondPosition))
                 {
@@ -712,17 +715,17 @@ public class ChessPanel extends View  {
     //工兵的迷宫算法
     private static boolean solved(int [][]a,int begin,int end,int targetX,int targetY)
     {
+        //you是什么东西？
         if (you)
         {
             return true;
         }
         if (begin==targetX&&end==targetY)
-
         {
             you=true;
             return true;
         }
-        a[begin][end]=2;
+        a[begin][end]=2;//本坐标设置2，开始向四面八方递归
         if (a[begin+1][end]==0)
         {
             solved(a,begin+1,end,targetX,targetY);
@@ -749,13 +752,17 @@ public class ChessPanel extends View  {
         //工兵算法
         if (mine.get(mine.indexOf(begin)).getWeight()==1)
         {
-            if ( (begin.getX()>0&&begin.getX()<13&&(begin.getY()==0||begin.getY()==4) )||begin.getX()==5||begin.getX()==8 )
+            //开始时的坐标限制
+            if ( (begin.getX()>0&&begin.getX()<13 &&(begin.getY()==0||begin.getY()==4) )||begin.getX()==5||begin.getX()==8 ||begin.getX()==1||begin.getX()==12 )
             {
-                if ( (end.getX()>0&&end.getX()<13&&(end.getY()==0||end.getY()==4) )||end.getX()==5||end.getX()==8 )
+                //结束的坐标限制
+                if ( (end.getX()>0&&end.getX()<13 &&(end.getY()==0||end.getY()==4) )||end.getX()==5||end.getX()==8 ||end.getX()==1||end.getX()==12 )
                 {
+
                     if (mine.get(mine.indexOf(begin)).getWeight()==1)
                     {
                         int [][]road={
+                                //这个地图是外面保留了一层1
                                 {1,1,1,1,1,1,1},
                                 {1,0,0,0,0,0,1},
                                 {1,0,1,1,1,0,1},
@@ -771,6 +778,10 @@ public class ChessPanel extends View  {
                                 {1,0,0,0,0,0,1},
                                 {1,1,1,1,1,1,1},
                         };
+
+                        /*
+                        * 在mine与enemy有的棋子，全部置2
+                        * */
                         for (int i=0;i<mine.size();i++)
                         {
                             int x=mine.get(i).getX();
@@ -958,7 +969,9 @@ public class ChessPanel extends View  {
         Regretmine.push(savemine);
         Regretenemy.push(saveenemy);
     }
-    //子线程
+
+
+    //子线程，实现了阵型的选择
    public class  ChoiceZhen extends AsyncTask<Void,Integer,Boolean>
     {
         @Override
