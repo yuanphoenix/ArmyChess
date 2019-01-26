@@ -50,11 +50,11 @@ public class basedPanel extends AppCompatActivity {
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
         android.support.v7.app.ActionBar actionBar=getSupportActionBar();
+
         if (actionBar!=null)
         {
             actionBar.hide();
         }
-
         List <distribution> distri=DataSupport.findAll(distribution.class);
         for (distribution dis:distri)
         {
