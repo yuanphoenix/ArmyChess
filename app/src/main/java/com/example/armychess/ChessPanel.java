@@ -703,6 +703,7 @@ public class ChessPanel extends View  {
     private  void BothDie(chess begin,chess end)
     {
         int wofang=0;
+
         int difang=0;
         SaveChess();
         wofang=mine.indexOf(begin);
