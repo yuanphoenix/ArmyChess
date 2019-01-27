@@ -664,6 +664,8 @@ public class ChessPanel extends View  {
     {
         boolean dileijunqi=false;
         boolean chiganjing=false;
+
+
         int numsofenenmy=0;//能动的我方人数
         int leiqi=0;//地雷和军旗的数量
         int size=mine.size();
