@@ -55,12 +55,12 @@ public class basedPanel extends AppCompatActivity {
         {
             actionBar.hide();
         }
-        List <distribution> distri=DataSupport.findAll(distribution.class);
+        List <distribution> distri=DataSupport.findAll(distribution.class);//List是存储阵型的名字
         for (distribution dis:distri)
         {
              whatchoice.add(dis.getName());
         }
-        showDialog();
+        showDialog();//显示选择阵型的界面
         Intent intent=getIntent();
         receive=intent.getStringExtra("address");
         Log.d(TAG, "onCreate: "+receive);

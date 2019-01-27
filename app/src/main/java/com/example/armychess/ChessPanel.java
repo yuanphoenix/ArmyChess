@@ -32,6 +32,7 @@ import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 /*
 * 这个view是蓝牙对战的核心。包括了对战的所有功能
+* 需要重点优化这个类！
 * */
 public class ChessPanel extends View  {
     private static String TAG="棋子";
@@ -40,7 +41,7 @@ public class ChessPanel extends View  {
     private boolean IsFirst=true;//判断落子的顺序，点击棋子，再次点击要落的区域
     private boolean isFirstImport=true;//这里是指第一次连接后，要将布局发送给对方。
 
-    private static boolean you=false;
+    private static boolean you=false;//工兵算法中，递归退出的标志
 
     private String address="a";
     private BluetoothSPP st;
@@ -218,7 +219,6 @@ public class ChessPanel extends View  {
 
         init();
     }
-
 
     //初始化权重对应的图片
     private void init() {
@@ -442,7 +442,6 @@ public class ChessPanel extends View  {
         lean((int )( lineHeight+2*lineWidth), (int) (3.5*lineHeight),canvas);
         lean((int )( lineHeight+2*lineWidth),(int) (10.5*lineHeight),canvas);
     }
-
    /*
      * 这是画斜线
     */
