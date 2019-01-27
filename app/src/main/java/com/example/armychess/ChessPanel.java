@@ -684,6 +684,8 @@ public class ChessPanel extends View  {
             dileijunqi=true;
         if (chiganjing||dileijunqi)
         {
+
+            //hah
             st.send("投降",true);
             Failed();
             isGameOver=true;
