@@ -81,7 +81,7 @@ Android Studio
 
 ## 想说的话
 ---
-本项目最初为了参加一个比赛，但是在开发项目的过程中，我逐渐获得了比参加比赛更重要的经验。我对这个项目有了一些的感情，未来有时间和精力的话，将会继续开发的。
+本项目最初为了参加一个比赛，但是在开发项目的过程中，我逐渐获得了比参加比赛更重要的经验。我对这个项目有了感情，未来有时间和精力的话，将会继续开发的。
 ## 特别感谢
 ***
 [Android-bluetoothSPPLibrary](https://github.com/akexorcist/Android-BluetoothSPPLibrary )
